@@ -103,7 +103,10 @@ class ChatbotTests(unittest.TestCase):
         self.assertEqual(bot.reply("quantum chromodynamics").text, FALLBACK_MESSAGE)
 
     def test_llm_failure_falls_back_to_faq(self):
-        bot = Chatbot(Settings(), make_faq(), FakeClient(fail=True))
+        # Force this case past the direct-FAQ branch so it exercises the
+        # fallback path after the LLM client fails.
+        settings = Settings(faq_direct_threshold=1.0)
+        bot = Chatbot(settings, make_faq(), FakeClient(fail=True))
         result = bot.reply("refund please, thanks a lot for the help")
         self.assertEqual(result.source, "faq-fallback")
 
